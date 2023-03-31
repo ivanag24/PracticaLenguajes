@@ -29,8 +29,9 @@ funcdef:  funchead CORCHETE_ABIERTO code CORCHETE_CERRADO;
 funchead: tbas IDENTIFIER  PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO;
 typedef1 : typedef2
         |;
-typedef2 : tbas IDENTIFIER
-        | ',' tbas IDENTIFIER typedef2;
+typedef2 : tbas IDENTIFIER typedef3;
+typedef3: ','typedef2
+        |;
 mainhead : tvoid MAIN  PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO;
 code : sent code
        |;

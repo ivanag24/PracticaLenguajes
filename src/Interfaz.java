@@ -1,12 +1,18 @@
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.StringReader;
 
 public class Interfaz extends JFrame implements ActionListener {
     private JButton boton;
     private JTextArea textArea;
     private JPanel panel;
-    private String texto;
+
 
     public Interfaz(){
         setContentPane(panel);
@@ -20,7 +26,19 @@ public class Interfaz extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == boton){
-             //pasar a clase externa el código=> new OtraClase(textArea.getText())
+            String text=textArea.getText();
+            StringReader reader = new StringReader(text);
+            CharStream input = null;
+            try {
+                input = CharStreams.fromReader(reader);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            GramaticaLexer lexico= new GramaticaLexer(input);
+            CommonTokenStream tokens= new CommonTokenStream(lexico);
+            GramaticaParser sintactico= new GramaticaParser(tokens);
+            sintactico.program();
+
         }
     }
 }
