@@ -1,48 +1,48 @@
 grammar Gramatica;
 
-program : dcllist funlist sentlist;
-dcllist : dcl dcllist
-        |;
-funlist :  funcdef funlist
-        |;
-sentlist: mainhead CORCHETE_ABIERTO code CORCHETE_CERRADO;
-dcl : ctelist
-    | varlist;
-ctelist : DEFINE CONST_DEF_IDENTIFIER simpvalue ctelist1;
-ctelist1: ctelist
-        |;
-simpvalue: NUMERIC_INTEGER_CONST
+program: VOID variableFuncionesMainVoid
+        | tipo  IDENTIFIER diferenciaFuncionVariable
+        | DEFINE CONST_DEF_IDENTIFIER simpvalue varCteFuncionMain;
+variableFuncionesMainVoid: IDENTIFIER diferenciaFuncionVariable
+        | MAIN PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO;
+diferenciaFuncionVariable:PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO funcionesMain
+        | vardef1 varCteFuncionMain;
+funcionesMainVoid:   IDENTIFIER PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO funcionesMain
+        | MAIN PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO ;
+funcionesMain:VOID funcionesMainVoid
+        | tipo IDENTIFIER PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO funcionesMain;
+varCteFuncionMain: VOID variableFuncionesMainVoid
+        | tipo IDENTIFIER diferenciaFuncionVariable
+        | DEFINE CONST_DEF_IDENTIFIER simpvalue varCteFuncionMain;
+vardef1: IGUAL simpvalue PUNTO_COMA
+        | PUNTO_COMA;
+simpvalue : NUMERIC_INTEGER_CONST
         | NUMERIC_REAL_CONST
         | STRING_CONST;
-varlist : vardef PUNTO_COMA varlist1;
-varlist1: varlist
-        |;
-vardef: tbas IDENTIFIER vardef1;
-vardef1: '=' simpvalue
-        |;
-tbas :INTEGER
+tipo:INTEGER
+        | FLOAT
+        | STRING ;
+tbas : INTEGER
         | FLOAT
         | STRING
         | tvoid;
 tvoid : VOID;
-funcdef:  funchead CORCHETE_ABIERTO code CORCHETE_CERRADO;
-funchead: tbas IDENTIFIER  PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO;
 typedef1 : typedef2
         |;
-typedef2 : tbas IDENTIFIER typedef3;
-typedef3: ','typedef2
+typedef2 : tbas IDENTIFIER  typedef3 ;
+typedef3: COMA typedef2
         |;
-mainhead : tvoid MAIN  PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO;
-code : sent code
-       |;
-sent : asig PUNTO_COMA
-        | funccall PUNTO_COMA
-        | vardef PUNTO_COMA;
-asig : IDENTIFIER IGUAL exp;
+code :  sent code
+        |;
+sent : IDENTIFIER sent1 PUNTO_COMA
+        | CONST_DEF_IDENTIFIER PUNTO_COMA
+        | tbas IDENTIFIER  vardef1;
+sent1: IGUAL exp
+        | subpparamlist ;
 exp : factor exp1;
-exp1:op exp
-        | ;
-op : MAS
+exp1: op exp
+        |;
+op :MAS
         | MENOS
         | MULTIPLICACION
         | DIV
@@ -50,12 +50,12 @@ op : MAS
 factor : simpvalue
         | PARENTESIS_ABIERTO exp PARENTESIS_CERRADO
         | funccall;
-funccall : IDENTIFIER subpparamlist
-        | CONST_DEF_IDENTIFIER subpparamlist;
+funccall :IDENTIFIER subpparamlist
+        | CONST_DEF_IDENTIFIER;
 subpparamlist : PARENTESIS_ABIERTO explist PARENTESIS_CERRADO
         |;
 explist : exp explist1;
-explist1: COMA explist
+explist1 :COMA explist
         |;
 
 RESTO: [ \n\r\t]->skip;
