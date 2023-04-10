@@ -1,5 +1,12 @@
 grammar Gramatica;
 
+@parser::members{
+    private boolean error=false;
+
+    public boolean getError(){
+        return error;
+    }
+}
 program: VOID variableFuncionesMainVoid
         | tipo  IDENTIFIER diferenciaFuncionVariable
         | DEFINE CONST_DEF_IDENTIFIER simpvalue varCteFuncionMain;
@@ -21,11 +28,13 @@ simpvalue : NUMERIC_INTEGER_CONST
         | STRING_CONST;
 tipo:INTEGER
         | FLOAT
-        | STRING ;
+        | STRING
+        |struct;
 tbas : INTEGER
         | FLOAT
         | STRING
-        | tvoid;
+        | tvoid
+        |struct;
 tvoid : VOID;
 typedef1 : typedef2
         |;
@@ -36,7 +45,11 @@ code :  sent code
         |;
 sent : IDENTIFIER sent1 PUNTO_COMA
         | CONST_DEF_IDENTIFIER PUNTO_COMA
-        | tbas IDENTIFIER  vardef1;
+        | tbas IDENTIFIER  vardef1
+        |if
+        |while
+        |dowhile
+        |for;
 sent1: IGUAL exp
         | subpparamlist ;
 exp : factor exp1;
@@ -56,6 +69,43 @@ subpparamlist : PARENTESIS_ABIERTO explist PARENTESIS_CERRADO
         |;
 explist : exp explist1;
 explist1 :COMA explist
+        |;
+
+if:IF expcond CORCHETE_ABIERTO code CORCHETE_CERRADO else1;
+else1:ELSE else2
+        |;
+else2 :  CORCHETE_ABIERTO code CORCHETE_CERRADO
+	    |if;
+while : WHILE PARENTESIS_ABIERTO expcond PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO;
+dowhile : DO CORCHETE_ABIERTO code CORCHETE_CERRADO WHILE PARENTESIS_ABIERTO expcond PARENTESIS_CERRADO PUNTO_COMA;
+for : FOR PARENTESIS_ABIERTO  for1;
+for1: vardef PUNTO_COMA expcond PUNTO_COMA asig PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
+        | asig PUNTO_COMA expcond PUNTO_COMA asig PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO;
+asig: IDENTIFIER IGUAL exp;
+vardef: tbas IDENTIFIER vardef2;
+vardef2: IGUAL simpvalue
+        |;
+expcond :  factorcond expcond1;
+expcond1: oplog expcond
+        |;
+oplog : OR
+        | AND;
+factorcond : simpvalue exp1 factorcond1
+        | funccall exp1 factorcond1
+        | PARENTESIS_ABIERTO factorcond parentesis
+        | NOT factorcond;
+factorcond1:opcomp exp
+        |;
+parentesis: expcond1 PARENTESIS_CERRADO
+        | PARENTESIS_CERRADO exp1  opcomp exp;
+opcomp : MENOR
+        |MAYOR
+        | MENOR_IGUAL
+        | MAYOR_IGUAL
+        | IGUALIGUAL ;
+struct : STRUCT CORCHETE_ABIERTO varlist CORCHETE_CERRADO;
+varlist: vardef PUNTO_COMA varlist1;
+varlist1: vardef PUNTO_COMA varlist
         |;
 
 RESTO: [ \n\r\t]->skip;
@@ -80,6 +130,20 @@ CORCHETE_ABIERTO:'{';
 CORCHETE_CERRADO:'}';
 PARENTESIS_ABIERTO:'(';
 PARENTESIS_CERRADO:')';
+IF:'if';
+ELSE: 'else';
+WHILE:'while';
+DO:'do';
+FOR:'for';
+OR:'||';
+AND:'&';
+NOT:'!';
+MAYOR:'>';
+MENOR:'<';
+IGUALIGUAL:'==';
+MENOR_IGUAL:'<=';
+MAYOR_IGUAL:'>=';
+STRUCT:'struct';
 
 IDENTIFIER:(GUION|LETRA_MIN)SIMBOLO_IDEN+;
 CONST_DEF_IDENTIFIER:(GUION|LETRA_MAY)SIMBOLO_CONST+;
