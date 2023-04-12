@@ -1,12 +1,6 @@
 grammar Gramatica;
 
-@parser::members{
-    private boolean error=false;
 
-    public boolean getError(){
-        return error;
-    }
-}
 program: VOID variableFuncionesMainVoid
         | tipo  IDENTIFIER diferenciaFuncionVariable
         | DEFINE CONST_DEF_IDENTIFIER simpvalue varCteFuncionMain;

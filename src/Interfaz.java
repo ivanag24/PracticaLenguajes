@@ -37,13 +37,16 @@ public class Interfaz extends JFrame implements ActionListener {
             }
             GramaticaLexer lexico= new GramaticaLexer(input);
             lexico.removeErrorListeners();
-            lexico.addErrorListener(new VerboseParser(texto2));
+            VerboseListener verboseListener = new VerboseListener(texto2);
+            lexico.addErrorListener(verboseListener);
             CommonTokenStream tokens= new CommonTokenStream(lexico);
             GramaticaParser sintactico= new GramaticaParser(tokens);
             sintactico.removeErrorListeners();
-            sintactico.addErrorListener(new VerboseParser(texto2));
+            VerboseParser verboseParser = new VerboseParser(texto2);
+            sintactico.addErrorListener(verboseParser);
+            sintactico.setErrorHandler(new ReportError());
             sintactico.program();
-            if(!sintactico.getError()){
+            if(!verboseParser.getError()&&!verboseListener.getError()){
                 JOptionPane.showMessageDialog(null, "Compilación completada", "Código correcto", JOptionPane.INFORMATION_MESSAGE);
             }
             else{
