@@ -1,4 +1,5 @@
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
 
 
 public class ReportError extends DefaultErrorStrategy {
@@ -24,10 +25,11 @@ public class ReportError extends DefaultErrorStrategy {
 
     @Override
     public void reportUnwantedToken(Parser recognizer){
-        String msg = "Entrada extraña: ";
-        String[] aux = getMissingSymbol(recognizer).getText().split(" ");
-        msg=msg+aux[2]+" Se esperaba: "+aux[4];
-        recognizer.notifyErrorListeners(msg);
+        Token t = recognizer.getCurrentToken();
+        String tokenName = this.getTokenErrorDisplay(t);
+        IntervalSet expecting = this.getExpectedTokens(recognizer);
+        String msg = "Entrada extraña: " + tokenName + " Se esperaba: " + expecting.toString(recognizer.getVocabulary());
+        recognizer.notifyErrorListeners(t, msg, (RecognitionException)null);
     }
 
 }
