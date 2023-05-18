@@ -27,8 +27,8 @@ funcionesMain:VOID funcionesMainVoid
 varCteFuncionMain: VOID variableFuncionesMainVoid
         | tipo IDENTIFIER diferenciaFuncionVariable
         | DEFINE CONST_DEF_IDENTIFIER simpvalue varCteFuncionMain;
-vardef1: IGUAL simpvalue PUNTO_COMA
-        | PUNTO_COMA;
+vardef1 returns [String var]: IGUAL simpvalue PUNTO_COMA {$var=$IGUAL.text +" "+$simpvalue.val+ $PUNTO_COMA.text;}
+        | PUNTO_COMA{$var=$PUNTO_COMA.text;};
 simpvalue returns [String val]: NUMERIC_INTEGER_CONST {$val=$NUMERIC_INTEGER_CONST.text;}
         | NUMERIC_REAL_CONST {$val=$NUMERIC_REAL_CONST.text;}
         | STRING_CONST {$val=$STRING_CONST.text;};
@@ -42,23 +42,23 @@ tbas returns [String type]: INTEGER {$type=$INTEGER.text;}
         | tvoid {$type=$tvoid.type;}
         |struct {$type=$struct.str;};
 tvoid returns [String type]: VOID {$type="void";};
-typedef1 : typedef2
-        |;
-typedef2 : tbas IDENTIFIER  typedef3 ;
-typedef3: COMA typedef2
-        |;
+typedef1 returns [String type]: typedef2 {$type=$typedef2.type;}
+        |{$type="";};
+typedef2 returns [String type]: tbas IDENTIFIER  typedef3 {$type=$tbas.type + " "+$IDENTIFIER.text+$typedef3.type;};
+typedef3 returns [String type]: COMA typedef2 {$type=$COMA.text + " "+$typedef2.type;}
+        |{$type="";};
 code returns [String cod]:  sent id1=code {$cod=$sent.se + $id1.cod;}
         | {$cod="";};
-sent returns [String se] : IDENTIFIER sent1 PUNTO_COMA
-        | CONST_DEF_IDENTIFIER PUNTO_COMA
-        | tbas IDENTIFIER  vardef1
-        |if
-        |while
-        |dowhile
-        |for
-        | return PUNTO_COMA;
-sent1: IGUAL exp
-        | subpparamlist ;
+sent returns [String se] : IDENTIFIER sent1 PUNTO_COMA {$se=$IDENTIFIER.text + " " +$sent1.se+ " "+$PUNTO_COMA.text;}
+        | CONST_DEF_IDENTIFIER PUNTO_COMA {$se=$CONST_DEF_IDENTIFIER.text +$PUNTO_COMA.text;}
+        | tbas IDENTIFIER  vardef1 {$se=$IDENTIFIER.text + " " +$vardef1.var;}
+        |id=if {$se=$id.i;}
+        |id1=while {$se=$id1.whi;}
+        |id2=dowhile {$se=$id2.dowhi;}
+        |id3=for {$se=$id3.fo;}
+        |id4=return PUNTO_COMA {$se=$id4.re + " " +$PUNTO_COMA.text;};
+sent1 returns [String se]: IGUAL exp {$se=$IGUAL.text + " "+$exp.ex;}
+        | subpparamlist {$se=$subpparamlist.lista;} ;
 return returns [String re]: RETURN exp {$re=$RETURN.text + " "+$exp.ex;};
 exp returns [String ex]: factor exp1 {$ex=$factor.fact+ " "+$exp1.ex;};
 exp1 returns [String ex]: op exp {$ex=$op.o + " "+$exp.ex;}
@@ -81,25 +81,25 @@ explist1 returns [String exlista]:COMA explist {$exlista= $COMA.text+ " "+$expli
         | {$exlista="";};
 
 if returns [String i]: IF expcond CORCHETE_ABIERTO code CORCHETE_CERRADO else1
-    {$i= $IF.text + $expcond.cond + $CORCHETE_ABIERTO.text +"\n\t"+$code.cod +"\n"+$CORCHETE_CERRADO.text+$else1.el;};
+    {$i= $IF.text + $expcond.cond + $CORCHETE_ABIERTO.text +$code.cod +$CORCHETE_CERRADO.text+$else1.el;};
 else1 returns [String el]:ELSE else2 {$el=$ELSE.text +" "+ $else2.el;}
         |{$el="";};
-else2 returns [String el]:  CORCHETE_ABIERTO code CORCHETE_CERRADO {$el=$CORCHETE_ABIERTO.text +"\n\t"+$code.cod+"\n";}
+else2 returns [String el]:  CORCHETE_ABIERTO code CORCHETE_CERRADO {$el=$CORCHETE_ABIERTO.text +$code.cod;}
 	    |id=if {$el=$id.i;};
 while returns [String whi]: WHILE PARENTESIS_ABIERTO expcond PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
         {$whi=$WHILE.text +$PARENTESIS_ABIERTO.text + " " +$expcond.cond + " " +$PARENTESIS_CERRADO.text+$CORCHETE_ABIERTO.text
-         +"\n\t"+ $code.cod +"\n"+ $CORCHETE_CERRADO.text;};
+         + $code.cod + $CORCHETE_CERRADO.text;};
 dowhile returns [String dowhi]: DO CORCHETE_ABIERTO code CORCHETE_CERRADO WHILE PARENTESIS_ABIERTO expcond PARENTESIS_CERRADO PUNTO_COMA
-        {$dowhi=$DO.text +" "+$CORCHETE_ABIERTO.text +"\n\t"+ $code.cod +"\n"+$CORCHETE_CERRADO.text + " "+
+        {$dowhi=$DO.text +" "+$CORCHETE_ABIERTO.text + $code.cod +$CORCHETE_CERRADO.text + " "+
          $WHILE.text +" "+$PARENTESIS_ABIERTO.text +" "+$expcond.cond +" "+$PARENTESIS_CERRADO.text+$PUNTO_COMA.text;};
 for returns [String fo]: FOR PARENTESIS_ABIERTO  for1 {$fo=$FOR.text +" "+$PARENTESIS_ABIERTO.text +" "+$for1.fo;};
 for1 returns [String fo]: vardef PUNTO_COMA expcond PUNTO_COMA asig PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
-                        {$fo=$vardef.var +$PUNTO_COMA.text + " "+$expcond.cond +$PUNTO_COMA.text + " "+$asig.asi
-                         +$PARENTESIS_CERRADO.text +$CORCHETE_ABIERTO.text + "\n\t"+$code.cod +"\t\n"+$CORCHETE_CERRADO.text;}
+                        {$fo=$vardef.var +$PUNTO_COMA.text + " "+ $expcond.cond +$PUNTO_COMA.text + " "+$asig.asi
+                         +$PARENTESIS_CERRADO.text +$CORCHETE_ABIERTO.text + $code.cod +$CORCHETE_CERRADO.text;}
         | asig PUNTO_COMA expcond PUNTO_COMA asig PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
             {$fo=$asig.asi+$PUNTO_COMA.text + " "+ $expcond.cond +$PUNTO_COMA.text +" "+$asig.asi +" "+
-            $PARENTESIS_CERRADO.text+$CORCHETE_ABIERTO.text +"\t\n"+$code.cod+"\n"+$CORCHETE_CERRADO.text;};
-asig returns [String asi]: IDENTIFIER IGUAL exp {$asi= $IDENTIFIER.text + " " + $IGUAL.text + " " +$exp.ex+"\n";};
+            $PARENTESIS_CERRADO.text+$CORCHETE_ABIERTO.text +$code.cod+$CORCHETE_CERRADO.text;};
+asig returns [String asi]: IDENTIFIER IGUAL exp {$asi= $IDENTIFIER.text + " " + $IGUAL.text + " " +$exp.ex;};
 vardef returns [String var]: tbas IDENTIFIER vardef2 {$var=$tbas.type +" "+$IDENTIFIER.text+" "+$vardef2.var;};
 vardef2 returns [String var]: IGUAL simpvalue {$var=$IGUAL.text+" "+$simpvalue.val;}
         | {$var="";};
@@ -113,7 +113,7 @@ factorcond returns [String fact]: simpvalue exp1 factorcond1 {$fact= $simpvalue.
         | PARENTESIS_ABIERTO factorcond parentesis {$fact= $PARENTESIS_ABIERTO.text +" "+$factorcond.fact +" "+$parentesis.par;}
         | NOT factorcond {$fact= $NOT.text +" "+$factorcond.fact;};
 factorcond1 returns [String fact]:opcomp exp {$fact= $opcomp.opc +" "+$exp.ex;}
-        |;
+        |{$fact="";};
 parentesis returns [String par]: expcond1 PARENTESIS_CERRADO {$par=$expcond1.cond+$PARENTESIS_CERRADO.text;};
 opcomp returns [String opc]: MENOR {$opc=$MENOR.text;}
         |MAYOR {$opc=$MAYOR.text;}
@@ -121,17 +121,17 @@ opcomp returns [String opc]: MENOR {$opc=$MENOR.text;}
         | MAYOR_IGUAL {$opc=$MAYOR_IGUAL.text;}
         | IGUALIGUAL {$opc=$IGUALIGUAL.text;};
 struct returns [String str]: STRUCT CORCHETE_ABIERTO varlist CORCHETE_CERRADO
-                            {$str=$STRUCT.text+$CORCHETE_ABIERTO.text+"\n\t";
+                            {$str=$STRUCT.text+$CORCHETE_ABIERTO.text;
                                  for(String s: $varlist.lista){
                                     $str=$str+"\t"+s;
                                  }
                                  $str=$str+"\n"+$CORCHETE_CERRADO.text;
                              };
 varlist returns [List<String> lista]: {$lista= new ArrayList<String>();}vardef PUNTO_COMA varlist1
-                                       {$lista.add($vardef.var+ $PUNTO_COMA.text +"\n");
+                                       {$lista.add($vardef.var+ $PUNTO_COMA.text);
                                        $lista.addAll($varlist1.lista);};
 varlist1 returns [List<String> lista]: {$lista= new ArrayList<String>();} vardef PUNTO_COMA id1=varlist1
-                                        {$lista.add($vardef.var+ $PUNTO_COMA.text +"\n");
+                                        {$lista.add($vardef.var+ $PUNTO_COMA.text);
                                          $lista.addAll($id1.lista);}
                                         | {$lista= new ArrayList<String>();};
 
