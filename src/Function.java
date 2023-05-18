@@ -1,22 +1,17 @@
-import java.util.ArrayList;
-import java.util.List;
-
 public class Function {
-    private ArrayList<String> sentencias= new ArrayList<>();
+    private String sentencias="";
 
     private String cabecera="";
     private String iden="";
 
-    public Function(String iden,String cabecera, List<String> sentencias) {
+    public Function(String iden,String cabecera, String sentencias) {
         this.iden=iden;
         this.cabecera=cabecera;
-        for (String s:sentencias) {
-            this.sentencias.add(s);
-        }
+        this.sentencias=sentencias;
     }
 
 
-    public List getSentencias(){
+    public String getSentencias(){
         return sentencias;
     }
 

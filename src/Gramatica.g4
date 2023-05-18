@@ -13,20 +13,32 @@ grammar Gramatica;
         program.closeFile();
     }
 }
-program: VOID variableFuncionesMainVoid
-        | tipo  IDENTIFIER diferenciaFuncionVariable
-        | DEFINE CONST_DEF_IDENTIFIER simpvalue varCteFuncionMain;
-variableFuncionesMainVoid: IDENTIFIER diferenciaFuncionVariable
-        | MAIN PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO;
-diferenciaFuncionVariable:PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO funcionesMain
-        | vardef1 varCteFuncionMain;
-funcionesMainVoid:   IDENTIFIER PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO funcionesMain
-        | MAIN PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO ;//Main
-funcionesMain:VOID funcionesMainVoid
-        | tipo IDENTIFIER PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO funcionesMain;
-varCteFuncionMain: VOID variableFuncionesMainVoid
-        | tipo IDENTIFIER diferenciaFuncionVariable
-        | DEFINE CONST_DEF_IDENTIFIER simpvalue varCteFuncionMain;
+program: VOID variableFuncionesMainVoid[$VOID.text]
+        | tipo  IDENTIFIER diferenciaFuncionVariable[$tipo.type,$IDENTIFIER.text]
+        | DEFINE CONST_DEF_IDENTIFIER simpvalue
+          {program.addCabecera("<div><span class=palres>"+$DEFINE.text+"</span><span class=cte>"
+          +$CONST_DEF_IDENTIFIER.text+"</span>"+$simpvalue.val+"</div>\n");} varCteFuncionMain;
+variableFuncionesMainVoid [String type]: IDENTIFIER diferenciaFuncionVariable[$type,$IDENTIFIER.text]
+        | MAIN PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
+        {program.addMain($type+" "+$MAIN.text+$PARENTESIS_ABIERTO.text+$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);};
+diferenciaFuncionVariable[String type, String iden]:PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
+        {program.addFunction($iden,$type +" "+$iden+" "+$PARENTESIS_ABIERTO.text+$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);} funcionesMain
+        | vardef1 {program.addCabecera("<div><span class=palres>"+$type+"</span><span class=ident>"
+        +$iden+"</span>"+$vardef1.var+"</div>\n");} varCteFuncionMain;
+funcionesMainVoid[String type]:   IDENTIFIER PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
+        {program.addFunction($IDENTIFIER.text,$type +" "+$IDENTIFIER.text+" "+$PARENTESIS_ABIERTO.text
+        +$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);} funcionesMain
+        | MAIN PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
+        {program.addMain($type+" "+$MAIN.text+$PARENTESIS_ABIERTO.text+$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);};
+funcionesMain:VOID funcionesMainVoid[$VOID.text]
+        | tipo IDENTIFIER PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
+        {program.addFunction($IDENTIFIER.text,$tipo.type +" "+$IDENTIFIER.text+" "+$PARENTESIS_ABIERTO.text
+        +$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);} funcionesMain;
+varCteFuncionMain: VOID variableFuncionesMainVoid[$VOID.text]
+        | tipo IDENTIFIER diferenciaFuncionVariable[$tipo.type,$IDENTIFIER.text]
+        | DEFINE CONST_DEF_IDENTIFIER simpvalue
+         {program.addCabecera("<div><span class=palres>"+$DEFINE.text+"</span><span class=cte>"
+                   +$CONST_DEF_IDENTIFIER.text+"</span>"+$simpvalue.val+"</div>\n");} varCteFuncionMain;
 vardef1 returns [String var]: IGUAL simpvalue PUNTO_COMA {$var=$IGUAL.text +" "+$simpvalue.val+ $PUNTO_COMA.text;}
         | PUNTO_COMA{$var=$PUNTO_COMA.text;};
 simpvalue returns [String val]: NUMERIC_INTEGER_CONST {$val=$NUMERIC_INTEGER_CONST.text;}
@@ -178,7 +190,6 @@ CONST_DEF_IDENTIFIER:((GUION SIMBOLO_CONST* (LETRA_MAY|NUMERO) SIMBOLO_CONST*) |
 NUMERIC_INTEGER_CONST:SIGNO?NUMERO+;
 NUMERIC_REAL_CONST:(DECIMAL | DECIMAL E SIGNO?NUMERO+);
 STRING_CONST:('\''STRING_SIMPLE+ '\''| '"'STRING_DOBLE+ '"');
-
 
 fragment DECIMAL:SIGNO?NUMERO*'.'NUMERO+;
 fragment SIGNO:[+-];
