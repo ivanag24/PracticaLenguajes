@@ -2,10 +2,10 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class Program {
-    private ArrayList<Function> functions= new ArrayList<>();
+    private final ArrayList<Function> functions= new ArrayList<>();
     private Function main;
     private String globales="";
-    private File file;
+    private final File file;
     FileWriter fw ;
     PrintWriter pw;
 

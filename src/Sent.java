@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Sent {
 
-    private ArrayList<String> palabras = new ArrayList<>();
+    private final ArrayList<String> palabras = new ArrayList<>();
 
     public void addWord(String s){
         palabras.add(s);

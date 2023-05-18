@@ -3,7 +3,7 @@ import org.antlr.v4.runtime.*;
 import javax.swing.*;
 
 public class VerboseParser extends BaseErrorListener{
-    private JTextArea texto;
+    private final JTextArea texto;
     private boolean error=false;
     public VerboseParser(JTextArea text){
         texto=text;

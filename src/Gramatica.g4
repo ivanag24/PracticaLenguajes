@@ -37,107 +37,107 @@ funcionesMain:VOID funcionesMainVoid[$VOID.text]
 varCteFuncionMain: VOID variableFuncionesMainVoid[$VOID.text]
         | tipo IDENTIFIER diferenciaFuncionVariable[$tipo.type,$IDENTIFIER.text]
         | DEFINE CONST_DEF_IDENTIFIER simpvalue
-         {program.addCabecera("<div><span class=palres>"+$DEFINE.text+"</span><span class=cte>"
+         {program.addCabecera("<span class=palres>"+$DEFINE.text+"</span><span class=cte>"
                    +$CONST_DEF_IDENTIFIER.text+"</span>"+$simpvalue.val+"</div>\n");} varCteFuncionMain;
-vardef1 returns [String var]: IGUAL simpvalue PUNTO_COMA {$var=$IGUAL.text +" "+$simpvalue.val+ $PUNTO_COMA.text;}
-        | PUNTO_COMA{$var=$PUNTO_COMA.text;};
-simpvalue returns [String val]: NUMERIC_INTEGER_CONST {$val=$NUMERIC_INTEGER_CONST.text;}
-        | NUMERIC_REAL_CONST {$val=$NUMERIC_REAL_CONST.text;}
-        | STRING_CONST {$val=$STRING_CONST.text;};
-tipo returns [String type]:INTEGER {$type=$INTEGER.text;}
-        | FLOAT {$type=$FLOAT.text;}
-        | STRING {$type=$STRING.text;}
-        |struct {$type=$struct.str;};
-tbas returns [String type]: INTEGER {$type=$INTEGER.text;}
-        | FLOAT {$type=$FLOAT.text;}
-        | STRING {$type=$STRING.text;}
-        | tvoid {$type=$tvoid.type;}
-        |struct {$type=$struct.str;};
+vardef1 returns [String var]: IGUAL simpvalue PUNTO_COMA {$var= $IGUAL.text + " <span class=ident>" + $simpvalue.val + "</span>" + $PUNTO_COMA.text;}
+        | PUNTO_COMA{$var= $PUNTO_COMA.text;};
+simpvalue returns [String val]: NUMERIC_INTEGER_CONST {$val= $NUMERIC_INTEGER_CONST.text;}
+        | NUMERIC_REAL_CONST {$val= $NUMERIC_REAL_CONST.text;}
+        | STRING_CONST {$val= $STRING_CONST.text;};
+tipo returns [String type]:INTEGER {$type= "<span class=palres>" + $INTEGER.text + "</span>";}
+        | FLOAT {$type= "<span class=palres>" + $FLOAT.text + "</span>";}
+        | STRING {$type= "<span class=palres>" + $STRING.text + "</span>";}
+        |struct {$type= $struct.str;};
+tbas returns [String type]: INTEGER {$type= "<span class=palres>" + $INTEGER.text + "</span>";}
+        | FLOAT {$type= "<span class=ident>" + $FLOAT.text + "</span>";}
+        | STRING {$type= "<span class=ident>" + $STRING.text + "</span>";}
+        | tvoid {$type= "<span class=ident>" + $tvoid.type + "</span>";}
+        |struct {$type= $struct.str;};
 tvoid returns [String type]: VOID {$type="void";};
-typedef1 returns [String type]: typedef2 {$type=$typedef2.type;}
+typedef1 returns [String type]: typedef2 {$type= $typedef2.type;}
         |{$type="";};
-typedef2 returns [String type]: tbas IDENTIFIER  typedef3 {$type=$tbas.type + " "+$IDENTIFIER.text+$typedef3.type;};
-typedef3 returns [String type]: COMA typedef2 {$type=$COMA.text + " "+$typedef2.type;}
+typedef2 returns [String type]: tbas IDENTIFIER  typedef3 {$type= $tbas.type + " <span class=ident>" +  $IDENTIFIER.text+$typedef3.type + "</span>";};
+typedef3 returns [String type]: COMA typedef2 {$type= $COMA.text + " " + $typedef2.type;}
         |{$type="";};
-code returns [String cod]:  sent id1=code {$cod=$sent.se + $id1.cod;}
+code returns [String cod]:  sent id1=code {$cod= $sent.se + $id1.cod;}
         | {$cod="";};
-sent returns [String se] : IDENTIFIER sent1 PUNTO_COMA {$se=$IDENTIFIER.text + " " +$sent1.se+ " "+$PUNTO_COMA.text;}
-        | CONST_DEF_IDENTIFIER PUNTO_COMA {$se=$CONST_DEF_IDENTIFIER.text +$PUNTO_COMA.text;}
-        | tbas IDENTIFIER  vardef1 {$se=$IDENTIFIER.text + " " +$vardef1.var;}
-        |id=if {$se=$id.i;}
-        |id1=while {$se=$id1.whi;}
-        |id2=dowhile {$se=$id2.dowhi;}
-        |id3=for {$se=$id3.fo;}
-        |id4=return PUNTO_COMA {$se=$id4.re + " " +$PUNTO_COMA.text;};
-sent1 returns [String se]: IGUAL exp {$se=$IGUAL.text + " "+$exp.ex;}
-        | subpparamlist {$se=$subpparamlist.lista;} ;
-return returns [String re]: RETURN exp {$re=$RETURN.text + " "+$exp.ex;};
-exp returns [String ex]: factor exp1 {$ex=$factor.fact+ " "+$exp1.ex;};
-exp1 returns [String ex]: op exp {$ex=$op.o + " "+$exp.ex;}
+sent returns [String se] : IDENTIFIER sent1 PUNTO_COMA {$se= "<span class=ident>" + $IDENTIFIER.text + "</span>" + $sent1.se + $PUNTO_COMA.text;}
+        | CONST_DEF_IDENTIFIER PUNTO_COMA {$se= "<span class=ident>" + $CONST_DEF_IDENTIFIER.text + "</span>" + $PUNTO_COMA.text;}
+        | tbas IDENTIFIER vardef1 {$se= $tbas.type + " <span class=ident>" + $IDENTIFIER.text + "</span> " + $vardef1.var;}
+        | id=if {$se=$id.i;}
+        | id1=while {$se=$id1.whi;}
+        | id2=dowhile {$se=$id2.dowhi;}
+        | id3=for {$se=$id3.fo;}
+        | id4=return PUNTO_COMA {$se= $id4.re + $PUNTO_COMA.text;};
+sent1 returns [String se]: IGUAL exp {$se= $IGUAL.text + " " + $exp.ex;}
+        | subpparamlist {$se= $subpparamlist.lista;} ;
+return returns [String re]: RETURN exp {$re= $RETURN.text + " " + $exp.ex;};
+exp returns [String ex]: factor exp1 {$ex= $factor.fact + " " + $exp1.ex;};
+exp1 returns [String ex]: op exp {$ex= "<span class=palres>" + $op.o + "</span> "+$exp.ex;}
         |{$ex="";};
 op returns [String o]:MAS {$o=$MAS.text;}
         | MENOS {$o=$MENOS.text;}
         | MULTIPLICACION {$o=$MULTIPLICACION.text;}
         | DIV {$o=$DIV.text;}
         | MOD {$o=$MOD.text;};
-factor returns [String fact]: simpvalue {$fact= $simpvalue.val;}
-        | PARENTESIS_ABIERTO exp PARENTESIS_CERRADO {$fact= $PARENTESIS_ABIERTO.text+" "+$exp.ex+ " "+$PARENTESIS_CERRADO.text;}
+factor returns [String fact]: simpvalue {$fact= "<span class=cte>" + $simpvalue.val + "</span";}
+        | PARENTESIS_ABIERTO exp PARENTESIS_CERRADO {$fact= $PARENTESIS_ABIERTO.text + $exp.ex + $PARENTESIS_CERRADO.text;}
         | funccall {$fact= $funccall.fun;};
-funccall returns [String fun]:IDENTIFIER subpparamlist {$fun=$IDENTIFIER.text +" "+$subpparamlist.lista;}
-        | CONST_DEF_IDENTIFIER {$fun=$CONST_DEF_IDENTIFIER.text;};
+funccall returns [String fun]:IDENTIFIER subpparamlist {$fun= "<span class=ident>" + $IDENTIFIER.text + "</span> "+ $subpparamlist.lista;}
+        | CONST_DEF_IDENTIFIER {$fun="<span class=cte>" + $CONST_DEF_IDENTIFIER.text + "</span>";};
 subpparamlist returns [String lista]: PARENTESIS_ABIERTO explist PARENTESIS_CERRADO
-                                     {$lista=$PARENTESIS_ABIERTO.text +" "+$explist.exlista+" "+$PARENTESIS_CERRADO.text;}
+                                     {$lista=$PARENTESIS_ABIERTO.text + $explist.exlista + $PARENTESIS_CERRADO.text;}
         |{$lista="";};
-explist returns [String exlista]: exp explist1 {$exlista= $exp.ex+ " "+$explist1.exlista;};
-explist1 returns [String exlista]:COMA explist {$exlista= $COMA.text+ " "+$explist.exlista;}
+explist returns [String exlista]: exp explist1 {$exlista= $exp.ex + " " + $explist1.exlista;};
+explist1 returns [String exlista]:COMA explist {$exlista= $COMA.text + " " + $explist.exlista;}
         | {$exlista="";};
 
 if returns [String i]: IF expcond CORCHETE_ABIERTO code CORCHETE_CERRADO else1
-    {$i= $IF.text + $expcond.cond + $CORCHETE_ABIERTO.text +$code.cod +$CORCHETE_CERRADO.text+$else1.el;};
-else1 returns [String el]:ELSE else2 {$el=$ELSE.text +" "+ $else2.el;}
+    {$i= "<span class=palres>" + $IF.text + "</span >" + $expcond.cond + " " + $CORCHETE_ABIERTO.text + "\n<div style=\"text-indent: 1cm\">" + $code.cod + "</div>\n" + $CORCHETE_CERRADO.text + $else1.el;};
+else1 returns [String el]:ELSE else2 {$el="<span class=palres>" + $ELSE.text +"</span> "+ $else2.el;}
         |{$el="";};
-else2 returns [String el]:  CORCHETE_ABIERTO code CORCHETE_CERRADO {$el=$CORCHETE_ABIERTO.text +$code.cod;}
+else2 returns [String el]:  CORCHETE_ABIERTO code CORCHETE_CERRADO {$el=$CORCHETE_ABIERTO.text + "\n<div style=\"text-indent: 1cm\">" + $code.cod + "</div>\n" + $CORCHETE_CERRADO.text;}
 	    |id=if {$el=$id.i;};
 while returns [String whi]: WHILE PARENTESIS_ABIERTO expcond PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
-        {$whi=$WHILE.text +$PARENTESIS_ABIERTO.text + " " +$expcond.cond + " " +$PARENTESIS_CERRADO.text+$CORCHETE_ABIERTO.text
-         + $code.cod + $CORCHETE_CERRADO.text;};
+        {$whi="<span class=palres>" + $WHILE.text + "</span >" + $PARENTESIS_ABIERTO.text + $expcond.cond + $PARENTESIS_CERRADO.text + $CORCHETE_ABIERTO.text
+         + "\n<div style=\"text-indent: 1cm\">" + $code.cod + "</div>\n" + $CORCHETE_CERRADO.text;};
 dowhile returns [String dowhi]: DO CORCHETE_ABIERTO code CORCHETE_CERRADO WHILE PARENTESIS_ABIERTO expcond PARENTESIS_CERRADO PUNTO_COMA
-        {$dowhi=$DO.text +" "+$CORCHETE_ABIERTO.text + $code.cod +$CORCHETE_CERRADO.text + " "+
-         $WHILE.text +" "+$PARENTESIS_ABIERTO.text +" "+$expcond.cond +" "+$PARENTESIS_CERRADO.text+$PUNTO_COMA.text;};
-for returns [String fo]: FOR PARENTESIS_ABIERTO  for1 {$fo=$FOR.text +" "+$PARENTESIS_ABIERTO.text +" "+$for1.fo;};
+        {$dowhi="<span class=palres>" + $DO.text +"</span> "+$CORCHETE_ABIERTO.text + "\n<div style=\"text-indent: 1cm\">" + $code.cod + "</div>\n" + $CORCHETE_CERRADO.text + " <span class=palres>" +
+         $WHILE.text +"</span> "+$PARENTESIS_ABIERTO.text + $expcond.cond +$PARENTESIS_CERRADO.text + $PUNTO_COMA.text;};
+for returns [String fo]: FOR PARENTESIS_ABIERTO  for1 {$fo="<span class=palres>" + $FOR.text + "</span> "+ $PARENTESIS_ABIERTO.text + $for1.fo;};
 for1 returns [String fo]: vardef PUNTO_COMA expcond PUNTO_COMA asig PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
                         {$fo=$vardef.var +$PUNTO_COMA.text + " "+ $expcond.cond +$PUNTO_COMA.text + " "+$asig.asi
-                         +$PARENTESIS_CERRADO.text +$CORCHETE_ABIERTO.text + $code.cod +$CORCHETE_CERRADO.text;}
+                         + $PARENTESIS_CERRADO.text + " " + $CORCHETE_ABIERTO.text + "\n<div style=\"text-indent: 1cm\">" + $code.cod + "</div>\n" + $CORCHETE_CERRADO.text;}
         | asig PUNTO_COMA expcond PUNTO_COMA asig PARENTESIS_CERRADO CORCHETE_ABIERTO code CORCHETE_CERRADO
-            {$fo=$asig.asi+$PUNTO_COMA.text + " "+ $expcond.cond +$PUNTO_COMA.text +" "+$asig.asi +" "+
-            $PARENTESIS_CERRADO.text+$CORCHETE_ABIERTO.text +$code.cod+$CORCHETE_CERRADO.text;};
-asig returns [String asi]: IDENTIFIER IGUAL exp {$asi= $IDENTIFIER.text + " " + $IGUAL.text + " " +$exp.ex;};
-vardef returns [String var]: tbas IDENTIFIER vardef2 {$var=$tbas.type +" "+$IDENTIFIER.text+" "+$vardef2.var;};
-vardef2 returns [String var]: IGUAL simpvalue {$var=$IGUAL.text+" "+$simpvalue.val;}
+            {$fo=$asig.asi + $PUNTO_COMA.text + " " + $expcond.cond + $PUNTO_COMA.text + " " + $asig.asi+
+            $PARENTESIS_CERRADO.text + " " + $CORCHETE_ABIERTO.text + "\n<div style=\"text-indent: 1cm\">" + $code.cod + "</div>\n" + $CORCHETE_CERRADO.text;};
+asig returns [String asi]: IDENTIFIER IGUAL exp {$asi= "<span class=ident>" + $IDENTIFIER.text + "</span " + $IGUAL.text + " " +$exp.ex;};
+vardef returns [String var]: tbas IDENTIFIER vardef2 {$var= $tbas.type + " <span class=ident>" + $IDENTIFIER.text + "</span> "+ $vardef2.var;};
+vardef2 returns [String var]: IGUAL simpvalue {$var=$IGUAL.text + "<span class=cte>" + $simpvalue.val + "</span>";}
         | {$var="";};
 expcond returns [String cond]:  factorcond expcond1 {$cond=$factorcond.fact +" "+ $expcond1.cond;};
-expcond1 returns [String cond]: oplog expcond {$cond=$oplog.log +" "+$expcond.cond;}
+expcond1 returns [String cond]: oplog expcond {$cond="<span class=palres>" + $oplog.log +"</span> "+$expcond.cond;}
         |{$cond="";};
 oplog returns [String log]: OR {$log=$OR.text;}
         | AND {$log=$AND.text;};
-factorcond returns [String fact]: simpvalue exp1 factorcond1 {$fact= $simpvalue.val +" "+$exp1.ex +" "+$factorcond1.fact;}
-        | funccall exp1 factorcond1 {$fact= $funccall.fun +" "+$exp1.ex +" "+$factorcond1.fact;}
-        | PARENTESIS_ABIERTO factorcond parentesis {$fact= $PARENTESIS_ABIERTO.text +" "+$factorcond.fact +" "+$parentesis.par;}
-        | NOT factorcond {$fact= $NOT.text +" "+$factorcond.fact;};
-factorcond1 returns [String fact]:opcomp exp {$fact= $opcomp.opc +" "+$exp.ex;}
+factorcond returns [String fact]: simpvalue exp1 factorcond1 {$fact= "<span class=cte>" + $simpvalue.val + "</span> " + $exp1.ex + " " + $factorcond1.fact;}
+        | funccall exp1 factorcond1 {$fact= $funccall.fun + " " +$exp1.ex + " " + $factorcond1.fact;}
+        | PARENTESIS_ABIERTO factorcond parentesis {$fact= $PARENTESIS_ABIERTO.text + $factorcond.fact + $parentesis.par;}
+        | NOT factorcond {$fact= "<span class=palres>" + $NOT.text +"</span> "+$factorcond.fact;};
+factorcond1 returns [String fact]:opcomp exp {$fact= "<span class=palres>" + $opcomp.opc +"</span> "+$exp.ex;}
         |{$fact="";};
-parentesis returns [String par]: expcond1 PARENTESIS_CERRADO {$par=$expcond1.cond+$PARENTESIS_CERRADO.text;};
+parentesis returns [String par]: expcond1 PARENTESIS_CERRADO {$par=$expcond1.cond + $PARENTESIS_CERRADO.text;};
 opcomp returns [String opc]: MENOR {$opc=$MENOR.text;}
         |MAYOR {$opc=$MAYOR.text;}
         | MENOR_IGUAL {$opc=$MENOR_IGUAL.text;}
         | MAYOR_IGUAL {$opc=$MAYOR_IGUAL.text;}
         | IGUALIGUAL {$opc=$IGUALIGUAL.text;};
 struct returns [String str]: STRUCT CORCHETE_ABIERTO varlist CORCHETE_CERRADO
-                            {$str=$STRUCT.text+$CORCHETE_ABIERTO.text;
+                            {$str= "<span class=palres>" + $STRUCT.text + "</span>" + $CORCHETE_ABIERTO.text + "\n<div style=\"text-indent: 1cm\">";
                                  for(String s: $varlist.lista){
-                                    $str=$str+"\t"+s;
+                                    $str=$str + s + "\n";
                                  }
-                                 $str=$str+"\n"+$CORCHETE_CERRADO.text;
+                                 $str=$str + "</div>" + $CORCHETE_CERRADO.text;
                              };
 varlist returns [List<String> lista]: {$lista= new ArrayList<String>();}vardef PUNTO_COMA varlist1
                                        {$lista.add($vardef.var+ $PUNTO_COMA.text);
