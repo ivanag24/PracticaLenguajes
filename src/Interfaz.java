@@ -3,54 +3,45 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 
-public class Interfaz extends JFrame implements ActionListener {
-    private JButton boton;
-    private JTextArea texto1;
+public class Interfaz extends JFrame {
     private JPanel panel;
-    private JTextArea texto2;
+    private JTextArea areaTexto;
 
-    public Interfaz(){
+    public Interfaz() {
         setContentPane(panel);
         setTitle("Compilar");
-        setSize(750,500);
+        setSize(750, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        boton.addActionListener(this);
         setVisible(true);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == boton){
-            texto2.setText("");
-            String text= texto1.getText();
-            StringReader reader = new StringReader(text);
-            CharStream input ;
+        JFileChooser seleccionar = new JFileChooser();
+        seleccionar.setCurrentDirectory(new File("."));
+        seleccionar.setDialogTitle("Seleccione el archivo");
+        seleccionar.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        seleccionar.setAcceptAllFileFilterUsed(false);
+        if (seleccionar.showOpenDialog(panel) == JFileChooser.APPROVE_OPTION) {
+            File archivo = seleccionar.getSelectedFile();
             try {
-                input = CharStreams.fromReader(reader);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            GramaticaLexer lexico= new GramaticaLexer(input);
-            lexico.removeErrorListeners();
-            VerboseListener verboseListener = new VerboseListener(texto2);
-            lexico.addErrorListener(verboseListener);
-            CommonTokenStream tokens= new CommonTokenStream(lexico);
-            GramaticaParser sintactico= new GramaticaParser(tokens);
-            sintactico.removeErrorListeners();
-            VerboseParser verboseParser = new VerboseParser(texto2);
-            sintactico.addErrorListener(verboseParser);
-            sintactico.setErrorHandler(new ReportError());
-            sintactico.program();
-            if(!verboseParser.getError()&&!verboseListener.getError()){
-                JOptionPane.showMessageDialog(null, "Compilación completada", "Código correcto", JOptionPane.INFORMATION_MESSAGE);
-            }
-            else{
-                JOptionPane.showMessageDialog(null, "Códigos con errores", "Error", JOptionPane.ERROR_MESSAGE);
+                CharStream input = CharStreams.fromFileName(archivo.getName());
+                String userDirectory = System.getProperty("user.dir");
+                GramaticaLexer lexico = new GramaticaLexer(input);
+                lexico.removeErrorListeners();
+                VerboseListener verboseListener = new VerboseListener(areaTexto);
+                lexico.addErrorListener(verboseListener);
+                CommonTokenStream tokens = new CommonTokenStream(lexico);
+                GramaticaParser sintactico = new GramaticaParser(tokens,archivo.getName(),userDirectory);
+                sintactico.removeErrorListeners();
+                VerboseParser verboseParser = new VerboseParser(areaTexto);
+                sintactico.addErrorListener(verboseParser);
+                sintactico.setErrorHandler(new ReportError());
+                sintactico.program();
+                sintactico.closeFile();
+                if (!verboseParser.getError() && !verboseListener.getError()) {
+                    JOptionPane.showMessageDialog(null, "Compilación completada", "Código correcto", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
