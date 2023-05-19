@@ -44,30 +44,37 @@ public class Program {
     }
 
     public void addParam(String name,String fun){
-        System.out.println(fun);
         Function f=getFunction(fun);
         f.addParam(name);
     }
 
-    public String getHRefPath(String name,Function f){
+    public String getHRefPath(String name,String fun){
+        Function f = getFunction(fun);
+        if(f == null){
+            return name;
+        }
+        System.out.println(f.getIden());
         if (f.containsParam(name)){
             if(f.getIden().equals("Main")){
-                return "<A href=\"PROGRAMA_PRINCIPAL:"+f.getIden()+":"+name+"\">"+name+"</A>";
+                return "<A href=\"#PROGRAMA_PRINCIPAL:"+f.getIden()+":"+name+"\">"+name+"</A>";
             }
             else{
-                return "<A href=\"FUNCIONES:"+f.getIden()+":"+name+"\">"+name+"</A>";
+                return "<A href=\"#FUNCIONES:"+f.getIden()+":"+name+"\">"+name+"</A>";
             }
         }
-        else if (functions.contains(name)){
-            return "<A href=\"FUNCIONES:"+name+"\">"+name+"</A>";
+        else if (functions.contains(f)){
+            return "<A href=\"#FUNCIONES:"+name+"\">"+name+"</A>";
         }
-        else if(globales.contains(name)){
-            return "<A href=\"PROGRAMA_PRINCIPAL:"+name+"\">"+name+"</A>";
+        else{
+            return "<A href=\"#PROGRAMA_PRINCIPAL:"+name+"\">"+name+"</A>";
         }
-        return name;
     }
 
-    public String getNamePath(String name,Function f){
+    public String getNamePath(String name,String fun){
+        Function f = getFunction(fun);
+        if(f == null){
+            return name;
+        }
         if (f.containsParam(name)){
             if(f.getIden().equals("Main")){
                 return "<A name=\"PROGRAMA_PRINCIPAL:"+f.getIden()+":"+name+"\">"+name+"</A>";
@@ -76,13 +83,12 @@ public class Program {
                 return "<A name=\"FUNCIONES:"+f.getIden()+":"+name+"\">"+name+"</A>";
             }
         }
-        else if (functions.contains(name)){
+        else if (functions.contains(f)){
             return "<A name=\"FUNCIONES:"+name+"\">"+name+"</A>";
         }
-        else if(globales.contains(name)){
+        else{
             return "<A name=\"PROGRAMA_PRINCIPAL:"+name+"\">"+name+"</A>";
         }
-        return name;
     }
 
     public Function getFunction(String name){
@@ -95,7 +101,6 @@ public class Program {
                    return f;
                 }
             }
-
             return null;
         }
     }
