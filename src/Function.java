@@ -1,8 +1,11 @@
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Function {
     private String sentencias="";
-
     private String cabecera="";
-
+    private List<String> parametros;
     private String cabeceraHTML="";
     private String iden="";
 
@@ -13,9 +16,9 @@ public class Function {
         for (String s:split) {
             cabecera=cabecera+s;
         }
+        parametros= new ArrayList<>();
         this.sentencias=sentencias;
     }
-
 
     public String getSentencias(){
         return sentencias;
@@ -29,4 +32,16 @@ public class Function {
     public String getIden(){
         return iden;
     }
+    public void setSentencias(String sentencia) {
+        sentencias=sentencia;
+    }
+    public void addParam(String param){
+        parametros.add(param);
+    }
+
+    public boolean containsParam(String name) {
+        return parametros.contains(name);
+    }
+
+
 }

@@ -14,19 +14,18 @@ program: VOID variableFuncionesMainVoid[$VOID.text] {program.writeFile();}
         | DEFINE CONST_DEF_IDENTIFIER simpvalue
           {program.addCabecera("<div><span class=palres>"+$DEFINE.text+"</span><span class=ident>"
           +" <A name=\"PROGRAMA_PRINCIPAL:"+$CONST_DEF_IDENTIFIER.text+"\">"+$CONST_DEF_IDENTIFIER.text+"</A></span>"+" "+$simpvalue.val+"</div>\n");} varCteFuncionMain {program.writeFile();};
-variableFuncionesMainVoid [String type]: IDENTIFIER diferenciaFuncionVariable[$type,$IDENTIFIER.text]
-        | MAIN PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code["PROGRAMA_PRINCIPAL:Main",1] CORCHETE_CERRADO
-        {program.addMain("<span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main\"> "+$MAIN.text+"</A></span>"+$PARENTESIS_ABIERTO.text
-        +$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);};
-diferenciaFuncionVariable[String type, String iden]:PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code["",1] CORCHETE_CERRADO
-        {program.addFunction($iden,"<span class=palres>"+$type +"</span><span class=ident> "+$iden+"</span>"+$PARENTESIS_ABIERTO.text
-        +$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);} funcionesMain
+variableFuncionesMainVoid [String type] : IDENTIFIER diferenciaFuncionVariable[$type,$IDENTIFIER.text]
+        | MAIN {program.addMain("<span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main\"> "+$MAIN.text+"</A></span>"+$PARENTESIS_ABIERTO.text
+        +$typedef1.type+$PARENTESIS_CERRADO.text,"");} PARENTESIS_ABIERTO typedef1[$MAIN.text] PARENTESIS_CERRADO CORCHETE_ABIERTO
+        code[$MAIN.text,1] {program.addCode($code.cod,$MAIN.text);} CORCHETE_CERRADO;
+diferenciaFuncionVariable[String type, String fun]:  {program.addFunction($iden,"<span class=palres>"+$type +"</span><span class=ident> "+$iden+"</span>"+$PARENTESIS_ABIERTO.text
+        +$typedef1.type+$PARENTESIS_CERRADO.text,"");} PARENTESIS_ABIERTO  typedef1[$fun] PARENTESIS_CERRADO CORCHETE_ABIERTO
+        code[$fun,1] {program.addCode($code.cod,$fun);}CORCHETE_CERRADO funcionesMain
         | vardef1 {program.addCabecera("<div><span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main"+$iden+"\">"
         +" "+$iden+"</A></span>"+" "+$vardef1.var+"</div>\n");} varCteFuncionMain;
-funcionesMainVoid[String type]:   IDENTIFIER PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code["",1] CORCHETE_CERRADO
-        {program.addFunction($IDENTIFIER.text,"<span class=palres>"+$type +"</span><span class=ident> "+$IDENTIFIER.text+"</span>"+$PARENTESIS_ABIERTO.text
-        +$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);} funcionesMain
-        | MAIN PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code["PROGRAMA_PRINCIPAL:Main",1] CORCHETE_CERRADO
+funcionesMainVoid[String type]:   IDENTIFIER {program.addFunction($IDENTIFIER.text,"<span class=palres>"+$type +"</span><span class=ident> "+$IDENTIFIER.text+"</span>"
++$PARENTESIS_ABIERTO.text+$typedef1.type+$PARENTESIS_CERRADO.text,"");} PARENTESIS_ABIERTO typedef1[$IDENTIFIER.text] PARENTESIS_CERRADO CORCHETE_ABIERTO code["",1] CORCHETE_CERRADO funcionesMain
+        | MAIN PARENTESIS_ABIERTO typedef1[$MAIN.text] PARENTESIS_CERRADO CORCHETE_ABIERTO code["PROGRAMA_PRINCIPAL:Main",1] CORCHETE_CERRADO
         {program.addMain("<span class=palres>"+$type+"</span><span class=ident> <A name=\"PROGRAMA_PRINCIPAL:Main\"> "+$MAIN.text+"</A></span>"+$PARENTESIS_ABIERTO.text
          +$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);};
 funcionesMain:VOID funcionesMainVoid[$VOID.text]
@@ -53,10 +52,14 @@ tbas returns [String type]: INTEGER {$type= "<span class=palres>" + $INTEGER.tex
         | tvoid {$type= "<span class=palres>" + $tvoid.type + "</span>";}
         |struct {$type= $struct.str;};
 tvoid returns [String type]: VOID {$type=$VOID.text;};
-typedef1 returns [String type]: typedef2 {$type=$typedef2.type;}
+typedef1 [String fun] returns [String type]: typedef2[$fun] {$type=$typedef2.type;}
         |{$type="";};
-typedef2 returns [String type]: tbas IDENTIFIER  typedef3 {$type=$tbas.type + " <span class=ident> "+$IDENTIFIER.text+"</span> "+$typedef3.type;};
-typedef3 returns [String type]: COMA typedef2 {$type=$COMA.text + " "+$typedef2.type;}
+typedef2 [String fun] returns [String type]: tbas IDENTIFIER  typedef3[$fun]
+                    {$type=$tbas.type + " <span class=ident> "+$IDENTIFIER.text+"</span> "+$typedef3.type;
+                        Function f=program.getFunction(fun);
+                        program.addParam(f,$IDENTIFIER.text);
+                    };
+typedef3 [String fun] returns [String type]: COMA typedef2[$fun] {$type=$COMA.text + " "+$typedef2.type;}
         |{$type="";};
 code [String ruta, int nh] returns [String cod, int ns]:  sent[ruta,nh] id1=code[ruta,nh] {$cod=$sent.se + $id1.cod;}
         | {$cod="";};

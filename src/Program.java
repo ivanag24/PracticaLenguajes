@@ -23,13 +23,53 @@ public class Program {
         Function function= new Function(iden,cabecera,sentencia);
         functions.add(function);
     }
-
+    public void addCode(String sentencia,String fun){
+        Function f=getFunction(fun);
+        f.setSentencias(sentencia);
+    }
     public void addMain(String cabecera, String sentencia){
         main=new Function("Main",cabecera,sentencia);
     }
 
     public void addCabecera(String global){
         globales=globales+global;
+    }
+
+    public void addParam(String name,String fun){
+        Function f=getFunction(fun);
+        f.addParam(name);
+    }
+
+    public String path(String name,Function f){
+        if (f.containsParam(name)){
+            if(f.getIden()=="Main"){
+                return "<A href=\"PROGRAMA_PRINCIPAL:"+f.getIden()+":"+name+"\">"+name+"</A>";
+            }
+            else{
+                return "<A href=\"FUNCIONES:"+f.getIden()+":"+name+"\">"+name+"</A>";
+            }
+        }
+        else if (functions.contains(name)){
+            return "<A href=\"FUNCIONES:"+name+"\">"+name+"</A>";
+        }
+        else if(globales.contains(name)){
+            return "<A href=\"PROGRAMA_PRINCIPAL:"+name+"\">"+name+"</A>";
+        }
+        return name;
+    }
+
+    public Function getFunction(String name){
+        if(name=="Main"){
+            return main;
+        }
+        else{
+            for (Function f: functions) {
+               if (f.getIden()==name){
+                   return f;
+               }
+            }
+            return null;
+        }
     }
 
     public void title(String nombre){
