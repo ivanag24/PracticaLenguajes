@@ -3,6 +3,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 
 public class Interfaz extends JFrame {
@@ -12,18 +13,17 @@ public class Interfaz extends JFrame {
     public Interfaz() {
         setContentPane(panel);
         setTitle("Compilar");
-        setSize(750, 500);
+        setSize(750, 100);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
+        setVisible(false);
         JFileChooser seleccionar = new JFileChooser();
-        seleccionar.setCurrentDirectory(new File("."));
+        seleccionar.setCurrentDirectory(FileSystemView.getFileSystemView().getHomeDirectory());
         seleccionar.setDialogTitle("Seleccione el archivo");
         seleccionar.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        seleccionar.setAcceptAllFileFilterUsed(false);
-        if (seleccionar.showOpenDialog(panel) == JFileChooser.APPROVE_OPTION) {
+        if (seleccionar.showOpenDialog(panel)== JFileChooser.APPROVE_OPTION) {
             File archivo = seleccionar.getSelectedFile();
             try {
-                CharStream input = CharStreams.fromFileName(archivo.getName());
+                CharStream input = CharStreams.fromFileName(archivo.getPath());
                 String userDirectory = System.getProperty("user.dir");
                 GramaticaLexer lexico = new GramaticaLexer(input);
                 lexico.removeErrorListeners();
@@ -36,9 +36,12 @@ public class Interfaz extends JFrame {
                 sintactico.addErrorListener(verboseParser);
                 sintactico.setErrorHandler(new ReportError());
                 sintactico.program();
-                sintactico.closeFile();
                 if (!verboseParser.getError() && !verboseListener.getError()) {
                     JOptionPane.showMessageDialog(null, "Compilación completada", "Código correcto", JOptionPane.INFORMATION_MESSAGE);
+                    System.exit(0);
+                }
+                else{
+                    setVisible(true);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
