@@ -15,23 +15,31 @@ program: VOID variableFuncionesMainVoid[$VOID.text] {program.writeFile();}
           {program.addCabecera("<div><span class=palres>"+$DEFINE.text+"</span><span class=ident>"
           +" <A name=\"PROGRAMA_PRINCIPAL:"+$CONST_DEF_IDENTIFIER.text+"\">"+$CONST_DEF_IDENTIFIER.text+"</A></span>"+" "+$simpvalue.val+"</div>\n");} varCteFuncionMain {program.writeFile();};
 variableFuncionesMainVoid [String type] : IDENTIFIER diferenciaFuncionVariable[$type,$IDENTIFIER.text]
-        | MAIN {program.addMain("<span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main\"> "+$MAIN.text+"</A></span>"+$PARENTESIS_ABIERTO.text
-        +$typedef1.type+$PARENTESIS_CERRADO.text,"");} PARENTESIS_ABIERTO typedef1[$MAIN.text] PARENTESIS_CERRADO CORCHETE_ABIERTO
-        code[$MAIN.text,1] {program.addCode($code.cod,$MAIN.text);} CORCHETE_CERRADO;
-diferenciaFuncionVariable[String type, String fun]:  {program.addFunction($iden,"<span class=palres>"+$type +"</span><span class=ident> "+$iden+"</span>"+$PARENTESIS_ABIERTO.text
-        +$typedef1.type+$PARENTESIS_CERRADO.text,"");} PARENTESIS_ABIERTO  typedef1[$fun] PARENTESIS_CERRADO CORCHETE_ABIERTO
-        code[$fun,1] {program.addCode($code.cod,$fun);}CORCHETE_CERRADO funcionesMain
-        | vardef1 {program.addCabecera("<div><span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main"+$iden+"\">"
-        +" "+$iden+"</A></span>"+" "+$vardef1.var+"</div>\n");} varCteFuncionMain;
-funcionesMainVoid[String type]:   IDENTIFIER {program.addFunction($IDENTIFIER.text,"<span class=palres>"+$type +"</span><span class=ident> "+$IDENTIFIER.text+"</span>"
-+$PARENTESIS_ABIERTO.text+$typedef1.type+$PARENTESIS_CERRADO.text,"");} PARENTESIS_ABIERTO typedef1[$IDENTIFIER.text] PARENTESIS_CERRADO CORCHETE_ABIERTO code["",1] CORCHETE_CERRADO funcionesMain
-        | MAIN PARENTESIS_ABIERTO typedef1[$MAIN.text] PARENTESIS_CERRADO CORCHETE_ABIERTO code["PROGRAMA_PRINCIPAL:Main",1] CORCHETE_CERRADO
-        {program.addMain("<span class=palres>"+$type+"</span><span class=ident> <A name=\"PROGRAMA_PRINCIPAL:Main\"> "+$MAIN.text+"</A></span>"+$PARENTESIS_ABIERTO.text
-         +$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);};
+        | MAIN {program.addFunction($MAIN.text);} PARENTESIS_ABIERTO typedef1[$MAIN.text] PARENTESIS_CERRADO CORCHETE_ABIERTO
+        code[$MAIN.text,1] {program.addCode($code.cod,$MAIN.text);
+                            program.addCabecera($MAIN.text,"<span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main\"> "+$MAIN.text+"</A></span>"+$PARENTESIS_ABIERTO.text
+                                    +$typedef1.type+$PARENTESIS_CERRADO.text);}
+                             CORCHETE_CERRADO;
+diferenciaFuncionVariable[String type, String fun]:  {program.addFunction($fun);} PARENTESIS_ABIERTO  typedef1[$fun] PARENTESIS_CERRADO CORCHETE_ABIERTO
+        code[$fun,1] {program.addCode($code.cod,$fun);
+                    program.addCabecera($fun,"<span class=palres>"+$type +"</span><span class=ident> "+$fun+"</span>"+$PARENTESIS_ABIERTO.text+$typedef1.type+$PARENTESIS_CERRADO.text);}
+                    CORCHETE_CERRADO funcionesMain
+        | vardef1 {program.addCabecera("<div><span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main"+$fun+"\">"
+        +" "+$fun+"</A></span>"+" "+$vardef1.var+"</div>\n");} varCteFuncionMain;
+funcionesMainVoid[String type]:   IDENTIFIER {program.addFunction($IDENTIFIER.text);} PARENTESIS_ABIERTO typedef1[$IDENTIFIER.text] PARENTESIS_CERRADO CORCHETE_ABIERTO code["",1]
+                {program.addCode($code.cod,$IDENTIFIER.text);
+                program.addCabecera($IDENTIFIER.text,"<span class=palres>"+$type +"</span><span class=ident> "+$IDENTIFIER.text+"</span>"
+                +$PARENTESIS_ABIERTO.text+$typedef1.type+$PARENTESIS_CERRADO.text);}
+                CORCHETE_CERRADO funcionesMain
+        | MAIN {program.addFunction($MAIN.text);} PARENTESIS_ABIERTO typedef1[$MAIN.text] PARENTESIS_CERRADO CORCHETE_ABIERTO code["PROGRAMA_PRINCIPAL:Main",1] CORCHETE_CERRADO
+                {program.addCode($code.cod,$MAIN.text);
+                            program.addCabecera($MAIN.text,"<span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main\"> "+$MAIN.text+"</A></span>"+$PARENTESIS_ABIERTO.text
+                 +$typedef1.type+$PARENTESIS_CERRADO.text);};
 funcionesMain:VOID funcionesMainVoid[$VOID.text]
-        | tipo IDENTIFIER PARENTESIS_ABIERTO typedef1 PARENTESIS_CERRADO CORCHETE_ABIERTO code["",1] CORCHETE_CERRADO
-        {program.addFunction($IDENTIFIER.text,"<span class=palres>"+$tipo.type +"</span><span class=ident> " +$IDENTIFIER.text+"</span>"+$PARENTESIS_ABIERTO.text
-        +$typedef1.type+$PARENTESIS_CERRADO.text,$code.cod);} funcionesMain;
+        | tipo IDENTIFIER {program.addFunction($IDENTIFIER.text);} PARENTESIS_ABIERTO typedef1[$IDENTIFIER.text] PARENTESIS_CERRADO CORCHETE_ABIERTO code["",1] CORCHETE_CERRADO
+        {program.addCode($code.cod,$IDENTIFIER.text);
+        program.addCabecera($IDENTIFIER.text,"<span class=palres>"+$tipo.type +"</span><span class=ident> " +$IDENTIFIER.text+"</span>"+$PARENTESIS_ABIERTO.text
+        +$typedef1.type+$PARENTESIS_CERRADO.text);} funcionesMain;
 varCteFuncionMain: VOID variableFuncionesMainVoid[$VOID.text]
         | tipo IDENTIFIER diferenciaFuncionVariable[$tipo.type,$IDENTIFIER.text]
         | DEFINE CONST_DEF_IDENTIFIER simpvalue
@@ -56,37 +64,36 @@ typedef1 [String fun] returns [String type]: typedef2[$fun] {$type=$typedef2.typ
         |{$type="";};
 typedef2 [String fun] returns [String type]: tbas IDENTIFIER  typedef3[$fun]
                     {$type=$tbas.type + " <span class=ident> "+$IDENTIFIER.text+"</span> "+$typedef3.type;
-                        Function f=program.getFunction(fun);
-                        program.addParam(f,$IDENTIFIER.text);
+                        program.addParam($IDENTIFIER.text,$fun);
                     };
 typedef3 [String fun] returns [String type]: COMA typedef2[$fun] {$type=$COMA.text + " "+$typedef2.type;}
         |{$type="";};
-code [String ruta, int nh] returns [String cod, int ns]:  sent[ruta,nh] id1=code[ruta,nh] {$cod=$sent.se + $id1.cod;}
+code [String fun, int nh] returns [String cod, int ns]:  sent[fun,nh] id1=code[fun,nh] {$cod=$sent.se + $id1.cod;}
         | {$cod="";};
-sent [String ruta, int nh] returns [String se] : IDENTIFIER sent1[ruta] PUNTO_COMA {$se="<div><span class=ident>"+$IDENTIFIER.text + "</span> " +$sent1.se+ " "+$PUNTO_COMA.text+"</div>";}
+sent [String fun, int nh] returns [String se] : IDENTIFIER sent1[fun] PUNTO_COMA {$se="<div><span class=ident>"+$IDENTIFIER.text + "</span> " +$sent1.se+ " "+$PUNTO_COMA.text+"</div>";}
         | CONST_DEF_IDENTIFIER PUNTO_COMA {$se="<div><span class=ident>"+$CONST_DEF_IDENTIFIER.text + "</span> "+$PUNTO_COMA.text+"</div>";}
-        | tbas IDENTIFIER  vardef1 {$se="<div>"+$tbas.type+"<span class=ident><A name=\""+$ruta+":"+$IDENTIFIER.text+"\">"+$IDENTIFIER.text + "</A></span> " +$vardef1.var+"</div>";}
-        |id=if[ruta,nh+1] {$se="<div>"+$id.i+"</div>";}
-        |id1=while[ruta,nh+1] {$se="<div>"+$id1.whi+"</div>";}
-        |id2=dowhile[ruta,nh+1] {$se="<div>"+$id2.dowhi+"</div>";}
-        |id3=for[ruta,nh+1] {$se="<div>"+$id3.fo+"</div>";}
-        |id4=return[ruta] PUNTO_COMA {$se="<div>"+$id4.re + " " +$PUNTO_COMA.text+"</div>";};
-sent1 [String ruta]  returns [String se]: IGUAL exp[ruta] {$se=$IGUAL.text + " "+$exp.ex;}
-        | subpparamlist[ruta] {$se=$subpparamlist.lista;} ;
-return[String ruta]  returns [String re]: RETURN exp[ruta] {$re="<span class=palres>"+$RETURN.text + "</span> "+$exp.ex;};
-exp [String ruta]  returns [String ex]: factor[ruta] exp1[ruta] {$ex=$factor.fact+ " "+$exp1.ex;};
-exp1 [String ruta]  returns [String ex]: op exp[ruta] {$ex=$op.o + " "+$exp.ex;}
+        | tbas IDENTIFIER  vardef1 {$se="<div>"+$tbas.type+"<span class=ident>"+program.getNamePath($IDENTIFIER.text,$fun)+"</span> " +$vardef1.var+"</div>";}
+        |id=if[fun,nh+1] {$se="<div>"+$id.i+"</div>";}
+        |id1=while[fun,nh+1] {$se="<div>"+$id1.whi+"</div>";}
+        |id2=dowhile[fun,nh+1] {$se="<div>"+$id2.dowhi+"</div>";}
+        |id3=for[fun,nh+1] {$se="<div>"+$id3.fo+"</div>";}
+        |id4=return[fun] PUNTO_COMA {$se="<div>"+$id4.re + " " +$PUNTO_COMA.text+"</div>";};
+sent1 [String fun]  returns [String se]: IGUAL exp[fun] {$se=$IGUAL.text + " "+$exp.ex;}
+        | subpparamlist[fun] {$se=$subpparamlist.lista;} ;
+return[String fun]  returns [String re]: RETURN exp[fun] {$re="<span class=palres>"+$RETURN.text + "</span> "+$exp.ex;};
+exp [String fun]  returns [String ex]: factor[fun] exp1[fun] {$ex=$factor.fact+ " "+$exp1.ex;};
+exp1 [String fun]  returns [String ex]: op exp[fun] {$ex=$op.o + " "+$exp.ex;}
         |{$ex="";};
 op returns [String o]:MAS {$o=$MAS.text;}
         | MENOS {$o=$MENOS.text;}
         | MULTIPLICACION {$o=$MULTIPLICACION.text;}
         | DIV {$o=$DIV.text;}
         | MOD {$o=$MOD.text;};
-factor [String ruta] returns [String fact]: simpvalue {$fact= $simpvalue.val;}
-        | PARENTESIS_ABIERTO exp[ruta] PARENTESIS_CERRADO {$fact= $PARENTESIS_ABIERTO.text+" "+$exp.ex+ " "+$PARENTESIS_CERRADO.text;}
-        | funccall[ruta] {$fact= $funccall.fun;};
-funccall [String ruta] returns [String fun]:IDENTIFIER subpparamlist[ruta] {$fun="<span class=ident><A href=\""+$ruta+":"+$IDENTIFIER.text+"\">" + $IDENTIFIER.text + "</A></span> "+$subpparamlist.lista;}
-        | CONST_DEF_IDENTIFIER subpparamlist[ruta]{$fun="<span class=ident><A href=\""+$ruta+":"+$CONST_DEF_IDENTIFIER.text+"\">" + $CONST_DEF_IDENTIFIER.text+ "</A></span> "+$subpparamlist.lista;};
+factor [String fun] returns [String fact]: simpvalue {$fact= $simpvalue.val;}
+        | PARENTESIS_ABIERTO exp[fun] PARENTESIS_CERRADO {$fact= $PARENTESIS_ABIERTO.text+" "+$exp.ex+ " "+$PARENTESIS_CERRADO.text;}
+        | funccall[fun] {$fact= $funccall.funName;};
+funccall [String fun] returns [String funName]:IDENTIFIER subpparamlist[fun] {$fun="<span class=ident>"+program.getHRefPath($IDENTIFIER.text,$fun)+"</span> "+$subpparamlist.lista;}
+        | CONST_DEF_IDENTIFIER subpparamlist[fun]{$fun="<span class=ident>"+program.getHRefPath($IDENTIFIER.text,$fun)+"</span> "+$subpparamlist.lista;};
 subpparamlist [String ruta] returns [String lista]: PARENTESIS_ABIERTO explist[ruta] PARENTESIS_CERRADO
          {$lista=$PARENTESIS_ABIERTO.text +" "+$explist.exlista+" "+$PARENTESIS_CERRADO.text;}
         |{$lista="";};

@@ -2,22 +2,27 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.ArrayList;
+
 public class Function {
     private String sentencias="";
     private String cabecera="";
     private List<String> parametros;
     private String cabeceraHTML="";
     private String iden="";
-
-    public Function(String iden,String cabeceraHTML, String sentencias) {
+    
+    public Function(String iden) {
         this.iden=iden;
+        System.out.println(iden);
+        parametros= new ArrayList<>();
+    }
+
+    public void setCabeceraHTML(String cabeceraHTML){
         this.cabeceraHTML=cabeceraHTML;
         String[] split = cabeceraHTML.split("<[^>]+>");
         for (String s:split) {
             cabecera=cabecera+s;
         }
-        parametros= new ArrayList<>();
-        this.sentencias=sentencias;
     }
 
     public String getSentencias(){
