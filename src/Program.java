@@ -43,17 +43,11 @@ public class Program {
         globales=globales+global;
     }
 
-    public void addParam(String name,String fun){
-        Function f=getFunction(fun);
-        f.addParam(name);
-    }
-
     public String getHRefPath(String name,String fun){
         Function f = getFunction(fun);
         if(f == null){
             return name;
         }
-        System.out.println(f.getIden());
         if (f.containsParam(name)){
             if(f.getIden().equals("Main")){
                 return "<A href=\"#PROGRAMA_PRINCIPAL:"+f.getIden()+":"+name+"\">"+name+"</A>";
@@ -62,12 +56,20 @@ public class Program {
                 return "<A href=\"#FUNCIONES:"+f.getIden()+":"+name+"\">"+name+"</A>";
             }
         }
-        else if (functions.contains(f)){
+        else if (functions.contains(getFunction(name))){
             return "<A href=\"#FUNCIONES:"+name+"\">"+name+"</A>";
         }
-        else{
+        else if (globales.contains(name)){
             return "<A href=\"#PROGRAMA_PRINCIPAL:"+name+"\">"+name+"</A>";
+        }else{
+            return name;
         }
+    }
+
+    public void addParam(String fun, String name){
+        System.out.println(fun + " " + name);
+        Function f = getFunction(fun);
+        f.addParam(name);
     }
 
     public String getNamePath(String name,String fun){
@@ -83,11 +85,13 @@ public class Program {
                 return "<A name=\"FUNCIONES:"+f.getIden()+":"+name+"\">"+name+"</A>";
             }
         }
-        else if (functions.contains(f)){
+        else if (functions.contains(getFunction(name))){
             return "<A name=\"FUNCIONES:"+name+"\">"+name+"</A>";
         }
-        else{
+        else if (globales.contains(name)){
             return "<A name=\"PROGRAMA_PRINCIPAL:"+name+"\">"+name+"</A>";
+        }else{
+            return name;
         }
     }
 

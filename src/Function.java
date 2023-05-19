@@ -13,7 +13,6 @@ public class Function {
     
     public Function(String iden) {
         this.iden=iden;
-        System.out.println(iden);
         parametros= new ArrayList<>();
     }
 
