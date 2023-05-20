@@ -24,13 +24,12 @@ public class Interfaz extends JFrame {
             File archivo = seleccionar.getSelectedFile();
             try {
                 CharStream input = CharStreams.fromFileName(archivo.getPath());
-                String userDirectory = System.getProperty("user.dir");
                 GramaticaLexer lexico = new GramaticaLexer(input);
                 lexico.removeErrorListeners();
                 VerboseListener verboseListener = new VerboseListener(areaTexto);
                 lexico.addErrorListener(verboseListener);
                 CommonTokenStream tokens = new CommonTokenStream(lexico);
-                GramaticaParser sintactico = new GramaticaParser(tokens,archivo.getName(),userDirectory);
+                GramaticaParser sintactico = new GramaticaParser(tokens,archivo.getName(),archivo.getParent());
                 sintactico.removeErrorListeners();
                 VerboseParser verboseParser = new VerboseParser(areaTexto);
                 sintactico.addErrorListener(verboseParser);
@@ -42,6 +41,7 @@ public class Interfaz extends JFrame {
                 }
                 else{
                     setVisible(true);
+
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

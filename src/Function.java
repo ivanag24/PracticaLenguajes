@@ -16,14 +16,6 @@ public class Function {
         parametros= new ArrayList<>();
     }
 
-    public void setCabeceraHTML(String cabeceraHTML){
-        this.cabeceraHTML=cabeceraHTML;
-        String[] split = cabeceraHTML.split("<[^>]+>");
-        for (String s:split) {
-            cabecera=cabecera+s;
-        }
-    }
-
     public String getSentencias(){
         return sentencias;
     }
@@ -39,10 +31,16 @@ public class Function {
     public void setSentencias(String sentencia) {
         sentencias=sentencia;
     }
+    public void setCabeceraHTML(String cabeceraHTML){
+        this.cabeceraHTML=cabeceraHTML;
+        String[] split = cabeceraHTML.split("<[^>]+>");
+        for (String s:split) {
+            cabecera=cabecera+s;
+        }
+    }
     public void addParam(String param){
         parametros.add(param);
     }
-
     public boolean containsParam(String name) {
         return parametros.contains(name);
     }
