@@ -7,6 +7,7 @@ grammar Gramatica;
         super(input);
     	_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
         program= new Program(nom,dir);
+        program.addFunction("Main");
     }
 }
 program: VOID variableFuncionesMainVoid[$VOID.text] {program.writeFile();}
@@ -15,7 +16,7 @@ program: VOID variableFuncionesMainVoid[$VOID.text] {program.writeFile();}
         +"</span><span class=ident>"+" <A name=\"PROGRAMA_PRINCIPAL:"+$CONST_DEF_IDENTIFIER.text+"\">"
         +$CONST_DEF_IDENTIFIER.text+"</A></span>"+" "+$simpvalue.val+"</div>\n");} varCteFuncionMain {program.writeFile();};
 variableFuncionesMainVoid [String type] : IDENTIFIER diferenciaFuncionVariable[$type,$IDENTIFIER.text]
-        | MAIN {program.addFunction($MAIN.text);} PARENTESIS_ABIERTO typedef1[$MAIN.text] PARENTESIS_CERRADO CORCHETE_ABIERTO
+        | MAIN PARENTESIS_ABIERTO typedef1[$MAIN.text] PARENTESIS_CERRADO CORCHETE_ABIERTO
         code[$MAIN.text,1] {program.addCode($code.cod,$MAIN.text);
         program.addCabecera($MAIN.text,"<span class=palres>"+$type+"</span><span class=ident><A name=\"PROGRAMA_PRINCIPAL:Main\"> "
         +$MAIN.text+"</A></span> "+$PARENTESIS_ABIERTO.text +$typedef1.type+$PARENTESIS_CERRADO.text);}CORCHETE_CERRADO;
@@ -96,7 +97,6 @@ subpparamlist [String fun] returns [String lista]: PARENTESIS_ABIERTO explist[$f
 explist [String fun] returns [String exlista]: exp[$fun] explist1[$fun] {$exlista= $exp.ex+ " "+$explist1.exlista;};
 explist1 [String fun] returns [String exlista]:COMA explist[$fun] {$exlista= $COMA.text+ " "+$explist.exlista;}
         | {$exlista="";};
-
 if [String fun, int nh] returns [String i]: IF expcond[$fun] CORCHETE_ABIERTO code[$fun,$nh] CORCHETE_CERRADO else1[$fun,$nh]
         {$i= "<span class=palres>" + $IF.text + "</span >" + $expcond.cond+ "\n<div>"+$CORCHETE_ABIERTO.text
         +"</div>\n<div style=\"text-indent: "+$nh+"cm\">"+$code.cod +"\n</div>\n<div>"+$CORCHETE_CERRADO.text+"</div>\n"+$else1.el;};
@@ -189,7 +189,7 @@ RETURN: 'return';
 IDENTIFIER:((GUION SIMBOLO_IDEN* (LETRA_MIN|NUMERO) SIMBOLO_IDEN*) | (LETRA_MIN SIMBOLO_IDEN*));
 CONST_DEF_IDENTIFIER:((GUION SIMBOLO_CONST* (LETRA_MAY|NUMERO) SIMBOLO_CONST*) | (LETRA_MAY SIMBOLO_CONST*));
 NUMERIC_INTEGER_CONST:SIGNO?NUMERO+;
-NUMERIC_REAL_CONST:(DECIMAL | DECIMAL E SIGNO?NUMERO+);
+NUMERIC_REAL_CONST:(DECIMAL | (DECIMAL|NUMERIC_INTEGER_CONST) E SIGNO?NUMERO+);
 STRING_CONST:('\''STRING_SIMPLE+ '\''| '"'STRING_DOBLE+ '"');
 
 fragment DECIMAL:SIGNO?NUMERO*'.'NUMERO+;
